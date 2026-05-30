@@ -1208,6 +1208,19 @@
         <div class="page-content hidden" id="page-manage_resellers">
             <div class="page-header"><h2 class="page-title">Manage <span>Resellers</span></h2></div>
             
+            <!-- VIP RESELLER SUPPORT CARD -->
+            <div class="premium-card reseller-only hidden" style="margin-bottom: 25px; max-width: 100%; display: flex; flex-wrap: wrap; gap: 15px; justify-content: space-between; align-items: center; padding: 20px 25px; border-left: 3px solid var(--neon-cyan); background: rgba(255, 42, 64, 0.03);">
+                <div>
+                    <h3 style="color:white; font-weight:800; text-transform:uppercase; font-size:16px; margin:0 !important; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-headset" style="color:var(--neon-cyan);"></i> VIP Reseller Support
+                    </h3>
+                    <p style="color: var(--text-muted); font-size:12px; margin:5px 0 0 0 !important;">Direct access to the Admin Team for reseller queries and assistance.</p>
+                </div>
+                <button class="btn btn-purchase" id="btn-reseller-support" style="width: auto; padding: 0 20px; margin: 0; min-width: 180px; height: 44px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fab fa-telegram-plane" style="font-size: 16px;"></i> CONTACT SUPPORT
+                </button>
+            </div>
+
             <div class="wallet-tabs" id="rmanage-tabs">
                 <div class="wallet-tab active" onclick="switchResellerTab('transfer', 'rmanage')" id="rtab-btn-transfer"><i class="fas fa-exchange-alt"></i> Transfer Balance</div>
                 <div class="wallet-tab" onclick="switchResellerTab('promote', 'rmanage')" id="rtab-btn-promote"><i class="fas fa-level-up-alt"></i> Promote User</div>
@@ -1426,6 +1439,7 @@
         window.panelsDataCache = {};
         window.currentHistoryTab = 'purchases';
         window.primarySupportLink = 'https://t.me/';
+        window.resellerSupportLink = null;
 
         window.appSettings = {
             minimumResellerDeposit: 5000,
@@ -1871,6 +1885,10 @@
                 const data = snap.val();
                 if(!data) return;
                 
+                // --- NEW: Reseller Support Link Realtime Listener ---
+                if(data.resellerSupportLink !== undefined) window.resellerSupportLink = data.resellerSupportLink;
+                else window.resellerSupportLink = null;
+                
                 if(data.minimumResellerDeposit !== undefined) window.appSettings.minimumResellerDeposit = data.minimumResellerDeposit;
                 if(data.resellerApprovalMode !== undefined) window.appSettings.resellerApprovalMode = data.resellerApprovalMode;
                 if(data.resellerCommissionPercent !== undefined) window.appSettings.resellerCommissionPercent = data.resellerCommissionPercent;
@@ -2045,6 +2063,18 @@
         document.getElementById('btn-logout').onclick = async () => {
             showLoader(); try { await signOut(auth); document.getElementById('dropdown-menu').classList.remove('active'); } catch(e) { console.error(e); }
         };
+
+        // --- RESELLER SUPPORT BUTTON ACTION ---
+        const btnResellerSupport = document.getElementById('btn-reseller-support');
+        if (btnResellerSupport) {
+            btnResellerSupport.onclick = () => {
+                if(window.resellerSupportLink && window.resellerSupportLink.trim() !== '') {
+                    window.open(window.resellerSupportLink, '_blank');
+                } else {
+                    showToast("Reseller Support Link Not Available", "warning");
+                }
+            };
+        }
 
         // --- USER DATA & RESELLER SYSTEM ---
         function initUserData() {
